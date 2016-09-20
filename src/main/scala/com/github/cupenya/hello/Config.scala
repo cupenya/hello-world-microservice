@@ -11,4 +11,10 @@ object Config {
     val interface = httpConfig.getString("interface")
     val port = httpConfig.getInt("port")
   }
+
+  object authentication {
+    private val authConfig = rootConfig.getConfig("authentication")
+
+    val secret = authConfig.getString("secret")
+  }
 }
