@@ -12,17 +12,15 @@ spec:
     spec:
       containers:
       - name: hello-world
-        image: eu.gcr.io/cpy-docker-test/hello-world
+        image: eu.gcr.io/cpy-docker-test/hello-world-service
         env:
         - name: HELLO_BIND_PORT
           value: "8080"
-#        - name: AUTH_SECRET
-#          valueFrom:
-#            secretKeyRef:
-#              name: k8s_auth_secret
-#              key: token
         - name: AUTH_SECRET
-          value: "secret"
+          valueFrom:
+            secretKeyRef:
+              name: auth-secret
+              key: secret
         ports:
         - containerPort: 8080
 ---
