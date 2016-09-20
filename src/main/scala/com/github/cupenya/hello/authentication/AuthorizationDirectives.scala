@@ -1,7 +1,7 @@
 package com.github.cupenya.hello.authentication
 
-import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
-import akka.http.scaladsl.server.{AuthorizationFailedRejection, _}
+import akka.http.scaladsl.model.headers.{ Authorization, OAuth2BearerToken }
+import akka.http.scaladsl.server.{ AuthorizationFailedRejection, _ }
 import com.github.cupenya.hello.Logging
 
 import scala.concurrent.ExecutionContext.Implicits.global

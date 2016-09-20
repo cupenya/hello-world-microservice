@@ -1,7 +1,7 @@
 package com.github.cupenya.hello
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.server.{AuthorizationFailedRejection, Directives, RejectionHandler}
+import akka.http.scaladsl.server.{ AuthorizationFailedRejection, Directives, RejectionHandler }
 import akka.http.scaladsl.model.StatusCodes._
 import com.github.cupenya.hello.authentication.AuthorizationDirectives
 import spray.json._
@@ -36,5 +36,4 @@ trait HelloHttpService extends Directives with AuthorizationDirectives with Spra
     }
   }
 }
-
 

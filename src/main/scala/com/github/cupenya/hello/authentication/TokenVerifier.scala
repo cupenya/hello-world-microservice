@@ -1,9 +1,9 @@
 package com.github.cupenya.hello.authentication
 
-import com.github.cupenya.hello.{Config, Logging}
-import pdi.jwt.{Jwt, JwtAlgorithm}
+import com.github.cupenya.hello.{ Config, Logging }
+import pdi.jwt.{ Jwt, JwtAlgorithm }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import spray.json._
 
 trait TokenVerifier[T] {
