@@ -1,0 +1,38 @@
+{
+  "name": "hello-world", // name of the resource
+  "resource": "hello", // the context root / api gateway path
+  "secured": "true", // whether a token is required for access
+  "ports": [ // contains the port spec
+    {
+      "port": 80, // the public port
+      "targetPort": 9090, // the internal port in the container to redirect to
+      "protocol": "TCP" // the protocol, can be dropped in most cases
+    }
+  ],
+  "deployment": { // settings for the actual deployment
+    "env": [ // environment variables
+      { // example config for a secret reference
+        "isSecretKeyRef": true,
+        "name": "AUTH_SECRET",
+        "secretKeyRefName": "auth-secret",
+        "secretKeyRefKey": "secret"
+      },
+      {
+        "name": "MONGO_DEFAULT_URI",
+        "value": "mongodb://mongo:27017"
+      }
+    ],
+    "jvmArgs": [ // arguments to be passed to the JVM / process in the machine
+      {"arg": "-Dcom.cupenya.hello=world"}
+    ],
+    "readinessProbe": { // readiness probe settings to be passed to the deployment
+      "path": "/health",
+      "port": 9090
+    },
+    "livenessProbe": { // liveness probe settings to be passed to the deployment
+      "path": "/",
+      "port": 9090
+    }
+  }
+}
+

@@ -1,12 +1,14 @@
 import ReleaseTransformations._
 import com.typesafe.sbt.packager.docker.Cmd
 
-name          := """hello-world-service"""
+name          := """hello-world"""
 organization  := "com.github.cupenya"
 scalaVersion  := "2.11.8"
-scalacOptions := Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf8")
+
+credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
 
 resolvers += Resolver.jcenterRepo
+resolvers += "Cupenya Nexus" at "https://test.cupenya.com/nexus/content/groups/public"
 
 libraryDependencies ++= {
   val akkaV            = "2.4.10"
@@ -33,32 +35,22 @@ libraryDependencies ++= {
   )
 }
 
-val branch = "git rev-parse --abbrev-ref HEAD" !!
-val cleanBranch = branch.toLowerCase.replaceAll(".*(cpy-[0-9]+).*", "$1").replaceAll("\\n", "").replaceAll("\\r", "")
-
-lazy val dockerImageFromJava = Seq(
-  packageName in Docker := "cpy-docker-test/" + name.value,
-  version in Docker     := "latest",
-  dockerBaseImage       := "airdock/oracle-jdk:jdk-1.8",
-  dockerRepository      := Some("eu.gcr.io"),
-  defaultLinuxInstallLocation in Docker := s"/opt/${name.value}", // to have consistent directory for files
-  dockerCommands ++= Seq(
-    Cmd("EXPOSE", "8080"),
-    Cmd("LABEL", "resource=hello"),
-    Cmd("LABEL", "name=hello-world-service")
-  )
+scalacOptions := Seq(
+  "-encoding", "utf8",
+  "-feature",
+  "-unchecked",
+  "-deprecation",
+  "-target:jvm-1.7",
+  "-Xlog-reflective-calls",
+  "-Ypatmat-exhaust-depth", "40",
+  "-Xmax-classfile-name", "240", // for docker container
+//      "-Xlog-implicits",
+//      disable compiler switches for now, some of them make an issue with recompilations
+  "-optimise"
+//      "-Yclosure-elim",
+//      "-Yinline",
+//      "-Ybackend:GenBCode"
 )
-
-lazy val root = project.in(file(".")).settings(dockerImageFromJava)
-
-Revolver.settings
-enablePlugins(DockerPlugin, JavaAppPackaging)
-
-initialCommands := """|import akka.actor._
-                      |import akka.pattern._
-                      |import akka.util._
-                      |import scala.concurrent._
-                      |import scala.concurrent.duration._""".stripMargin
 
 publishMavenStyle := true
 publishArtifact in Test := false
@@ -84,13 +76,6 @@ pomExtra :=
     <url>https://github.com/cupenya/hello-world-service</url>
     <connection>scm:git:git@github.com:cupenya/hello-world-service.git</connection>
   </scm>
-  <developers>
-    <developer>
-      <id>jeroenr</id>
-      <name>Jeroen Rosenberg</name>
-      <url>https://github.com/jeroenr/</url>
-    </developer>
-  </developers>
 
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
@@ -106,3 +91,22 @@ releaseProcess := Seq[ReleaseStep](
   ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
   pushChanges
 )
+
+mainClass in Compile := Some("com.github.cupenya.hello.Boot")
+
+updateOptions := updateOptions.value.withCachedResolution(true)
+
+// docker
+enablePlugins(JavaServerAppPackaging)
+enablePlugins(DockerPlugin)
+
+publishArtifact in (Compile, packageDoc) := false
+
+val shortCommit = ("git rev-parse --short HEAD" !!).replaceAll("\\n", "").replaceAll("\\r", "")
+
+packageName in Docker := "cpy-docker-test/" + name.value
+version in Docker     := shortCommit
+dockerBaseImage       := "airdock/oracle-jdk:jdk-1.8"
+defaultLinuxInstallLocation in Docker := s"/opt/${name.value}" // to have consistent directory for files
+dockerRepository := Some("eu.gcr.io")
+
