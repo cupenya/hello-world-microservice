@@ -73,8 +73,8 @@ pomExtra :=
     </license>
   </licenses>
   <scm>
-    <url>https://github.com/cupenya/hello-world-service</url>
-    <connection>scm:git:git@github.com:cupenya/hello-world-service.git</connection>
+    <url>https://github.com/cupenya/hello-world-microservice</url>
+    <connection>scm:git:git@github.com:cupenya/hello-world-microservice.git</connection>
   </scm>
 
 releaseProcess := Seq[ReleaseStep](
